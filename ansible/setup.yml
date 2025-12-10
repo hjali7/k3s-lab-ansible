@@ -1,0 +1,71 @@
+---
+- name: Initial Server Setup & Security
+  hosts: devops_vps
+  become: true
+  vars:
+    user_name: devops
+    local_ssh_pub_key: "~/.ssh/liara_key.pub"
+
+  tasks:
+    - name: Update and upgrade apt packages
+      apt:
+        update_cache: yes
+        upgrade: 'yes'
+        cache_valid_time: 3600
+
+      register: apt_status
+      retries: 60
+      delay: 5
+      until: apt_status is success
+
+    - name: Install essential packages
+      apt:
+        name:
+          - git
+          - curl
+          - vim
+          - htop
+          - ufw
+          - net-tools
+        state: present
+
+    - name: Create a new user with sudo privileges
+      user:
+        name: "{{ user_name }}"
+        shell: /bin/bash
+        groups: sudo
+        append: yes
+        create_home: yes
+
+    - name: Allow 'devops' user to have passwordless sudo
+      lineinfile:
+        dest: /etc/sudoers
+        state: present
+        regexp: '^%wheel'
+        line: 'devops ALL=(ALL) NOPASSWD: ALL'
+        validate: 'visudo -cf %s'
+
+    - name: Set up authorized keys for the new user
+      authorized_key:
+        user: "{{ user_name }}"
+        state: present
+        key: "{{ lookup('file', local_ssh_pub_key) }}"
+
+    - name: UFW - Allow SSH
+      ufw:
+        rule: allow
+        name: OpenSSH
+
+    - name: UFW - Allow HTTP/HTTPS
+      ufw:
+        rule: allow
+        port: "{{ item }}"
+        proto: tcp
+      loop:
+        - '80'
+        - '443'
+        - '6443'
+    
+    - name: UFW - Enable Firewall
+      ufw:
+        state: enabled

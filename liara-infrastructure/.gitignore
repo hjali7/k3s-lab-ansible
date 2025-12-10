@@ -1,0 +1,20 @@
+# SSH Keys
+*.pem
+*.key
+*.pub
+id_rsa
+id_ed25519
+
+# Ansible Configs & Retry files
+*.retry
+inventory.ini
+ansible.cfg
+
+# Kubernetes Configs
+kubeconfig
+config
+admin.conf
+
+# OS generated files
+.DS_Store
+Thumbs.db

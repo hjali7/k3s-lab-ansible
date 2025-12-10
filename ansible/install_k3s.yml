@@ -1,0 +1,44 @@
+---
+- name: Install k3s Cluster
+  hosts: devops_vps
+  become: true
+  vars:
+    server_ip: "46.34.163.151"
+    local_kubeconfig_path: "~/.kube/config"
+
+  tasks:
+    - name: Download and install k3s
+      shell: curl -sfl https://get.k3s.io | sh -
+      args:
+        creates: /usr/local/bin/k3s
+
+    - name: Wait for k3s to be up and running
+      service:
+        name: k3s
+        state: started
+        enabled: yes
+
+    - name: Get k3s config file contents
+      slurp:
+        src: /etc/rancher/k3s/k3s.yaml
+      register: k3s_config
+
+    - name: Write kubeconfig to local machine
+      copy:
+        content: "{{ k3s_config['content'] | b64decode }}"
+        dest: "{{ local_kubeconfig_path }}"
+        mode: '0600'
+      delegate_to: localhost
+      become: false
+
+    - name: Update server IP in local kubeconfig
+      replace:
+        path: "{{ local_kubeconfig_path }}"
+        regexp: '127\.0\.0\.1'
+        replace: "{{ server_ip }}"
+      delegate_to: localhost
+      become: false
+
+    - name: Final Message
+      debug:
+        msg: "K3s installed! Try running 'kubectl get nodes' locally"

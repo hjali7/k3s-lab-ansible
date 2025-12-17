@@ -70,8 +70,6 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: shorter-ingress
-  annotations:
-    cert-manager.io/cluster-issuer: letsencrypt-prod
 spec:
   rules:
     - host: "shorter.46.34.163.151.nip.io"
@@ -84,7 +82,3 @@ spec:
                 name: shorter-service
                 port:
                   number: 80
-  tls:
-    - hosts:
-        - "shorter.46.34.163.151.nip.io"
-      secretName: backend-tls-secret

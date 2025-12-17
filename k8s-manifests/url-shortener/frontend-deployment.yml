@@ -40,8 +40,6 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: frontend-ingress
-  annotations:
-    cert-manager.io/cluster-issuer: letsencrypt-prod
 spec:
   rules:
     - host: "46.34.163.151.nip.io"
@@ -54,7 +52,3 @@ spec:
                 name: frontend-service
                 port:
                   number: 80
-  tls:
-    - hosts:
-        - "46.34.163.151.nip.io"
-      secretName: frontend-tls-secret

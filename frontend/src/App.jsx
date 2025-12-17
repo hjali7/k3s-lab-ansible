@@ -10,18 +10,15 @@ function App() {
   const [url, setUrl] = useState('');
   const [loading, setLoading] = useState(false);
   const [history, setHistory] = useState([]);
-  const [lastShortened, setLastShortened] = useState(null); // برای نمایش QR کد
+  const [lastShortened, setLastShortened] = useState(null);
 
-  // ✅ آدرس بک‌ند (حتماً http باشد چون SSL نداریم)
   const BACKEND_URL = "http://shorter.46.34.163.151.nip.io/shorten";
 
-  // بارگذاری تاریخچه
   useEffect(() => {
     const savedHistory = localStorage.getItem('linkHistory');
     if (savedHistory) setHistory(JSON.parse(savedHistory));
   }, []);
 
-  // ذخیره تاریخچه
   useEffect(() => {
     localStorage.setItem('linkHistory', JSON.stringify(history));
   }, [history]);
@@ -34,10 +31,7 @@ function App() {
     }
     
     setLoading(true);
-    setLastShortened(null); // مخفی کردن نتیجه قبلی هنگام درخواست جدید
-
-    // شبیه‌سازی تاخیر برای دیدن انیمیشن لودینگ (اختیاری)
-    // await new Promise(resolve => setTimeout(resolve, 800));
+    setLastShortened(null);
 
     try {
       const response = await fetch(BACKEND_URL, {
@@ -57,7 +51,7 @@ function App() {
       };
       
       setHistory([newEntry, ...history]);
-      setLastShortened(data.short_url); // ست کردن برای نمایش QR
+      setLastShortened(data.short_url);
       setUrl('');
       toast.success("Link shortened successfully!");
       
@@ -76,17 +70,15 @@ function App() {
 
   const deleteItem = (id) => {
     setHistory(history.filter(item => item.id !== id));
-    if (history.length === 1) setLastShortened(null); // اگر آخرین آیتم پاک شد، QR هم پاک شود
+    if (history.length === 1) setLastShortened(null);
     toast.success('Item deleted from history');
   };
 
-  // تنظیمات انیمیشن کانتینر اصلی
   const containerVariants = {
     hidden: { opacity: 0, y: 20 },
     visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeOut" } }
   };
 
-  // تنظیمات انیمیشن آیتم‌های لیست
   const listVariants = {
     hidden: { opacity: 0, x: -20 },
     visible: { opacity: 1, x: 0 }
@@ -94,7 +86,6 @@ function App() {
 
   return (
     <div className="app-layout">
-      {/* کامپوننت نمایش اعلان‌ها */}
       <Toaster position="top-center" toastOptions={{
         style: {
           background: '#1e293b',
@@ -103,7 +94,6 @@ function App() {
         }
       }}/>
 
-      {/* --- سایدبار --- */}
       <div className="sidebar">
         <h2><FiActivity /> Recent Links ({history.length})</h2>
         <div className="history-list">
@@ -148,7 +138,6 @@ function App() {
         </div>
       </div>
 
-      {/* --- محتوای اصلی --- */}
       <div className="main-content">
         <motion.div 
           className="card"
@@ -186,7 +175,6 @@ function App() {
             </motion.button>
           </form>
 
-          {/* --- بخش نمایش نتیجه و QR کد --- */}
           <AnimatePresence>
             {lastShortened && !loading && (
               <motion.div 
@@ -205,11 +193,10 @@ function App() {
                   animate={{ scale: 1 }}
                   transition={{ type: "spring", stiffness: 200, damping: 10 }}
                 >
-                  {/* تولید QR کد در فرانت‌اند */}
                   <QRCodeSVG 
                     value={lastShortened} 
                     size={140}
-                    level={"H"} // سطح تصحیح خطای بالا
+                    level={"H"}
                     includeMargin={true}
                   />
                   <span className="qr-label">Scan to open on mobile</span>

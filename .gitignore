@@ -4,7 +4,6 @@
 /backend/dist/
 /backend/*.exe
 /backend/*.test
-/backend/go.sum
 /backend/.devcontainer/
 
 # --- Node/React (Frontend) ---

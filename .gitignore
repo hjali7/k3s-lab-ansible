@@ -1,1 +1,24 @@
 .env.local
+# --- Go (Backend) ---
+/backend/bin/
+/backend/dist/
+/backend/*.exe
+/backend/*.test
+/backend/go.sum
+/backend/.devcontainer/
+
+# --- Node/React (Frontend) ---
+/frontend/node_modules/
+/frontend/dist/
+/frontend/build/
+/frontend/.env.local
+/frontend/.env
+
+# --- Ansible ---
+*.retry
+/ansible/inventory.ini
+
+# --- System ---
+.DS_Store
+.vscode/
+.idea/

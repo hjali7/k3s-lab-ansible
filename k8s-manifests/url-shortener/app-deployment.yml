@@ -1,0 +1,84 @@
+# 1. تنظیمات محیطی (غیر حساس)
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: shorter-config
+data:
+  # نکته مهم: نام سرویس دیتابیس در کوبرنتیز تبدیل به DNS می‌شود
+  DB_HOST: "postgres-service"
+  DB_PORT: "5432"
+  DB_USER: "postgres"
+  DB_NAME: "shortener_db"
+  APP_PORT: "8080"
+  # دامنه را داینامیک با nip.io ست می‌کنیم (آی‌پی سرور خودت را جایگزین کن اگر تغییر کرده)
+  APP_DOMAIN: "http://shorter.46.34.163.151.nip.io"
+
+---
+# 2. تعریف پادها (Deployment)
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: shorter-app
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: shorter
+  template:
+    metadata:
+      labels:
+        app: shorter
+    spec:
+      containers:
+        - name: shorter
+          image: alihajizadeh/go-shorter:v2
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8080
+          envFrom:
+            - configMapRef:
+                name: shorter-config
+          env:
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secret
+                  key: postgres-password
+          resources:
+            requests:
+              memory: "10Mi"
+              cpu: "10m"
+            limits:
+              memory: "50Mi"
+              cpu: "100m"
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: shorter-service
+spec:
+  selector:
+    app: shorter
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8080
+
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: shorter-ingress
+spec:
+  rules:
+    - host: "shorter.46.34.163.151.nip.io"
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: shorter-service
+                port:
+                  number: 80

@@ -1,0 +1,54 @@
+# 1. Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: shorter-frontend  # نام هماهنگ شد
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: shorter-frontend # <--- کلید ماجرا اینجاست
+  template:
+    metadata:
+      labels:
+        app: shorter-frontend # <--- این لیبل روی پاد می‌خورد
+    spec:
+      containers:
+        - name: frontend
+          image: YOUR_DOCKERHUB_USER/react-shortener:v1  # ⚠️ نام یوزرت رو چک کن
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 80
+
+---
+# 2. Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: frontend-service
+spec:
+  selector:
+    app: shorter-frontend  # <--- 🚨 این باید دقیقاً مثل لیبل بالا باشد
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+
+---
+# 3. Ingress
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: frontend-ingress
+spec:
+  rules:
+    - host: "46.34.163.151.nip.io"
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: frontend-service
+                port:
+                  number: 80

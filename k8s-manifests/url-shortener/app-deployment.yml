@@ -69,7 +69,7 @@ spec:
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: shortener-ingress
+  name: shorter-ingress
   annotations:
     cert-manager.io/cluster-issuer: letsencrypt-prod
 spec:
@@ -81,7 +81,7 @@ spec:
             pathType: Prefix
             backend:
               service:
-                name: shortener-service
+                name: shorter-service
                 port:
                   number: 80
   tls:

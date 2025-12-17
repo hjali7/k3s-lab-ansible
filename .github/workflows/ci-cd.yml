@@ -30,7 +30,7 @@ jobs:
           context: ./backend
           file: ./backend/Dockerfile
           push: true
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/go-shortener:latest
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/go-shorter:latest
 
   # ---------------------------------------------------
   # Job 2: Build & Push FRONTEND (CI)
@@ -56,7 +56,7 @@ jobs:
           context: ./frontend
           file: ./frontend/Dockerfile
           push: true
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/react-shortener:latest
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/react-shorter:latest
 
   # ---------------------------------------------------
   # Job 3: Deploy to Server (CD) 🚀

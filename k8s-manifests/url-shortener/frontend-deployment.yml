@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: frontend
-          image: YOUR_DOCKERHUB_USER/react-shortener:v1
+          image: YOUR_DOCKERHUB_USER/react-shorter:v1
           imagePullPolicy: Always
           ports:
             - containerPort: 80

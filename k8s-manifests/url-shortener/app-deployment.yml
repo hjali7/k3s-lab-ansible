@@ -29,7 +29,7 @@ spec:
     spec:
       containers:
         - name: shorter
-          image: alihajizadeh/go-shorter:v2
+          image: alihajizadeh/go-shorter:latest
           imagePullPolicy: Always
           ports:
             - containerPort: 8080

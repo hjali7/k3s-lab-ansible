@@ -34,6 +34,7 @@ graph TD
         Push --> Deploy[SSH Remote Deployment]
         Deploy -->|Rollout Restart| Backend & Frontend
     end
+```
 
 🛠️ Tech Stack
 Backend (/backend)

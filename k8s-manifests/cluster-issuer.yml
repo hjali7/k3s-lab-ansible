@@ -9,6 +9,10 @@ spec:
     privateKeySecretRef:
       name: letsencrypt-prod
     solvers:
-      - http01:
-          ingress:
-            class: traefik
+    - http01:
+        ingress:
+          class: traefik
+          podTemplate:
+            spec:
+              nodeSelector:
+                kubernetes.io/os: linux

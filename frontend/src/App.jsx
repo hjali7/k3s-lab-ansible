@@ -8,9 +8,8 @@ function App() {
   const [history, setHistory] = useState([]);
 
   // آدرس بک‌ند (چون HTTPS فعال کردیم، حتما https باشد)
-  const BACKEND_URL = "https://shorter.46.34.163.151.nip.io/shorten";
+  const BACKEND_URL = "http://shorter.46.34.163.151.nip.io/shorten";
 
-  // 1. بارگذاری تاریخچه از LocalStorage هنگام اجرای برنامه
   useEffect(() => {
     const savedHistory = localStorage.getItem('linkHistory');
     if (savedHistory) {
@@ -18,7 +17,6 @@ function App() {
     }
   }, []);
 
-  // 2. ذخیره تاریخچه در LocalStorage هر وقت لیست تغییر کرد
   useEffect(() => {
     localStorage.setItem('linkHistory', JSON.stringify(history));
   }, [history]);
@@ -41,7 +39,6 @@ function App() {
 
       const data = await response.json();
       
-      // اضافه کردن به تاریخچه (لینک جدید اول لیست بیاید)
       const newEntry = {
         id: Date.now(),
         original: url,
@@ -50,7 +47,6 @@ function App() {
       
       setHistory([newEntry, ...history]);
       
-      // پاک کردن ورودی
       setUrl('');
       
     } catch (err) {
@@ -72,7 +68,6 @@ function App() {
   return (
     <div className="app-layout">
       
-      {/* سایدبار: تاریخچه */}
       <div className="sidebar">
         <h2>📜 History ({history.length})</h2>
         <div className="history-list">
@@ -98,7 +93,6 @@ function App() {
         </div>
       </div>
 
-      {/* بخش اصلی: فرم */}
       <div className="main-content">
         <div className="card">
           <h1>DevOps <span className="gradient-text">Shortener</span></h1>

@@ -2,79 +2,128 @@
   --primary: #6366f1;
   --bg: #f8fafc;
   --text: #1e293b;
+  --sidebar-bg: #ffffff;
   --card-bg: #ffffff;
 }
 
 body {
   margin: 0;
-  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  font-family: 'Inter', system-ui, sans-serif;
   background-color: var(--bg);
   color: var(--text);
+  height: 100vh;
+  overflow: hidden; /* جلوگیری از اسکرول صفحه اصلی */
+}
+
+/* لایوت اصلی: سایدبار + محتوا */
+.app-layout {
+  display: flex;
+  height: 100vh;
+}
+
+/* --- سایدبار (تاریخچه) --- */
+.sidebar {
+  width: 350px;
+  background: var(--sidebar-bg);
+  border-right: 1px solid #e2e8f0;
+  display: flex;
+  flex-direction: column;
+  padding: 1.5rem;
+  box-shadow: 2px 0 10px rgba(0,0,0,0.02);
+}
+
+.sidebar h2 { font-size: 1.2rem; margin-bottom: 1.5rem; color: #334155; display: flex; align-items: center; gap: 8px; }
+.history-list {
+  flex: 1;
+  overflow-y: auto;
+  padding-right: 8px;
+}
+
+/* آیتم‌های تاریخچه */
+.history-item {
+  background: #f1f5f9;
+  padding: 1rem;
+  border-radius: 12px;
+  margin-bottom: 1rem;
+  transition: all 0.2s;
+  border: 1px solid transparent;
+  position: relative;
+}
+.history-item:hover { border-color: var(--primary); background: #fff; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
+
+.history-short { font-weight: 700; color: var(--primary); display: block; margin-bottom: 4px; text-decoration: none; }
+.history-original { font-size: 0.8rem; color: #64748b; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: block; max-width: 250px; }
+
+.history-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+}
+.btn-xs {
+  padding: 4px 8px;
+  font-size: 0.75rem;
+  border-radius: 6px;
+  cursor: pointer;
+  border: none;
+}
+.btn-copy { background: #e2e8f0; color: #475569; }
+.btn-copy:hover { background: #cbd5e1; }
+.btn-del { background: #fee2e2; color: #ef4444; }
+.btn-del:hover { background: #fecaca; }
+
+/* --- بخش اصلی (فرم) --- */
+.main-content {
+  flex: 1;
   display: flex;
   justify-content: center;
   align-items: center;
-  min-height: 100vh;
+  position: relative;
 }
 
-.container {
+.card {
   background: var(--card-bg);
-  padding: 2.5rem;
-  border-radius: 16px;
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  padding: 3rem;
+  border-radius: 24px;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
   width: 100%;
-  max-width: 420px;
+  max-width: 500px;
   text-align: center;
 }
 
-h1 { margin-bottom: 2rem; font-weight: 800; letter-spacing: -0.025em; }
+h1 { margin-bottom: 2rem; font-weight: 800; font-size: 2.5rem; }
 .gradient-text {
-  background: linear-gradient(to right, #6366f1, #a855f7);
+  background: linear-gradient(to right, #6366f1, #ec4899);
   -webkit-background-clip: text;
   color: transparent;
 }
 
-.input-group { margin-bottom: 1.5rem; text-align: left; }
-label { display: block; font-size: 0.875rem; font-weight: 500; margin-bottom: 0.5rem; color: #64748b; }
-
 input {
   width: 100%;
-  padding: 0.75rem 1rem;
-  border: 1px solid #e2e8f0;
-  border-radius: 8px;
-  font-size: 1rem;
+  padding: 1rem;
+  border: 2px solid #e2e8f0;
+  border-radius: 12px;
+  font-size: 1.1rem;
+  margin-bottom: 1rem;
   transition: all 0.2s;
-  box-sizing: border-box; /* مهم برای فیکس شدن سایز */
+  box-sizing: border-box;
 }
-input:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2); }
+input:focus { outline: none; border-color: var(--primary); }
 
-button {
+.btn-primary {
   width: 100%;
-  padding: 0.875rem;
+  padding: 1rem;
   background: var(--primary);
   color: white;
   border: none;
-  border-radius: 8px;
+  border-radius: 12px;
+  font-size: 1.1rem;
   font-weight: 600;
   cursor: pointer;
-  transition: transform 0.1s, opacity 0.2s;
+  transition: transform 0.1s;
 }
-button:hover { opacity: 0.9; }
-button:active { transform: scale(0.98); }
-button:disabled { background: #cbd5e1; cursor: not-allowed; }
+.btn-primary:active { transform: scale(0.98); }
+.error-msg { color: #ef4444; margin-top: 1rem; }
 
-.result {
-  margin-top: 2rem;
-  padding: 1rem;
-  background: #eff6ff;
-  border-radius: 8px;
-  border: 1px solid #dbeafe;
-}
-.short-link {
-  display: block;
-  margin-top: 0.5rem;
-  color: var(--primary);
-  font-weight: 700;
-  text-decoration: none;
-  word-break: break-all;
-}
-.error { color: #ef4444; margin-top: 1rem; font-size: 0.9rem; }
+/* اسکرول بار زیبا */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }

@@ -1,20 +1,18 @@
-# 1. تنظیمات محیطی (غیر حساس)
+# 1
 apiVersion: v1
 kind: ConfigMap
 metadata:
   name: shorter-config
 data:
-  # نکته مهم: نام سرویس دیتابیس در کوبرنتیز تبدیل به DNS می‌شود
   DB_HOST: "postgres-service"
   DB_PORT: "5432"
   DB_USER: "postgres"
   DB_NAME: "shortener_db"
   APP_PORT: "8080"
-  # دامنه را داینامیک با nip.io ست می‌کنیم (آی‌پی سرور خودت را جایگزین کن اگر تغییر کرده)
   APP_DOMAIN: "http://shorter.46.34.163.151.nip.io"
 
 ---
-# 2. تعریف پادها (Deployment)
+# 2 Deployment
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -53,6 +51,7 @@ spec:
               cpu: "100m"
 
 ---
+# 2. Service
 apiVersion: v1
 kind: Service
 metadata:
@@ -66,10 +65,13 @@ spec:
       targetPort: 8080
 
 ---
+# 3. Ingress
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: shorter-ingress
+  name: shortener-ingress
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
 spec:
   rules:
     - host: "shorter.46.34.163.151.nip.io"
@@ -79,6 +81,10 @@ spec:
             pathType: Prefix
             backend:
               service:
-                name: shorter-service
+                name: shortener-service
                 port:
                   number: 80
+  tls:
+    - hosts:
+        - "shorter.46.34.163.151.nip.io"
+      secretName: backend-tls-secret

@@ -1,19 +1,33 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import './App.css';
 
 function App() {
   const [url, setUrl] = useState('');
-  const [shortUrl, setShortUrl] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [history, setHistory] = useState([]);
 
-  // آدرس بک‌ند (آدرس اینگرس بک‌ند خودت رو اینجا چک کن)
-  const BACKEND_URL = "http://shorter.46.34.163.151.nip.io/shorten";
+  // آدرس بک‌ند (چون HTTPS فعال کردیم، حتما https باشد)
+  const BACKEND_URL = "https://shorter.46.34.163.151.nip.io/shorten";
+
+  // 1. بارگذاری تاریخچه از LocalStorage هنگام اجرای برنامه
+  useEffect(() => {
+    const savedHistory = localStorage.getItem('linkHistory');
+    if (savedHistory) {
+      setHistory(JSON.parse(savedHistory));
+    }
+  }, []);
+
+  // 2. ذخیره تاریخچه در LocalStorage هر وقت لیست تغییر کرد
+  useEffect(() => {
+    localStorage.setItem('linkHistory', JSON.stringify(history));
+  }, [history]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!url) return;
+    
     setError('');
-    setShortUrl('');
     setLoading(true);
 
     try {
@@ -26,47 +40,86 @@ function App() {
       if (!response.ok) throw new Error('Failed to shorten link');
 
       const data = await response.json();
-      setShortUrl(data.short_url);
+      
+      // اضافه کردن به تاریخچه (لینک جدید اول لیست بیاید)
+      const newEntry = {
+        id: Date.now(),
+        original: url,
+        short: data.short_url
+      };
+      
+      setHistory([newEntry, ...history]);
+      
+      // پاک کردن ورودی
+      setUrl('');
+      
     } catch (err) {
-      setError('Something went wrong. Please try again.');
+      setError('Error: Could not shorten link. Is the backend running?');
     } finally {
       setLoading(false);
     }
   };
 
+  const copyToClipboard = (text) => {
+    navigator.clipboard.writeText(text);
+    alert('Link copied to clipboard! 📋');
+  };
+
+  const deleteItem = (id) => {
+    setHistory(history.filter(item => item.id !== id));
+  };
+
   return (
-    <div className="container">
-      <h1>
-        <span className="gradient-text">DevOps</span> Shortener
-      </h1>
+    <div className="app-layout">
       
-      <form onSubmit={handleSubmit}>
-        <div className="input-group">
-          <label>Enter your long URL</label>
-          <input
-            type="url"
-            placeholder="https://example.com/very/long/url..."
-            value={url}
-            onChange={(e) => setUrl(e.target.value)}
-            required
-          />
+      {/* سایدبار: تاریخچه */}
+      <div className="sidebar">
+        <h2>📜 History ({history.length})</h2>
+        <div className="history-list">
+          {history.length === 0 && <p style={{color:'#94a3b8'}}>No links yet. Try shortening one!</p>}
+          
+          {history.map((item) => (
+            <div key={item.id} className="history-item">
+              <a href={item.short} target="_blank" rel="noreferrer" className="history-short">
+                {item.short}
+              </a>
+              <span className="history-original" title={item.original}>{item.original}</span>
+              
+              <div className="history-actions">
+                <button className="btn-xs btn-copy" onClick={() => copyToClipboard(item.short)}>
+                  Copy 📋
+                </button>
+                <button className="btn-xs btn-del" onClick={() => deleteItem(item.id)}>
+                  Delete 🗑️
+                </button>
+              </div>
+            </div>
+          ))}
         </div>
-        
-        <button type="submit" disabled={loading}>
-          {loading ? 'Processing...' : 'Shorten Now ✨'}
-        </button>
-      </form>
+      </div>
 
-      {error && <div className="error">{error}</div>}
+      {/* بخش اصلی: فرم */}
+      <div className="main-content">
+        <div className="card">
+          <h1>DevOps <span className="gradient-text">Shortener</span></h1>
+          
+          <form onSubmit={handleSubmit}>
+            <input
+              type="url"
+              placeholder="Paste your long URL here..."
+              value={url}
+              onChange={(e) => setUrl(e.target.value)}
+              required
+            />
+            <button type="submit" className="btn-primary" disabled={loading}>
+              {loading ? 'Shortening...' : 'Shorten URL 🚀'}
+            </button>
+          </form>
 
-      {shortUrl && (
-        <div className="result">
-          <span>Success! Here is your link:</span>
-          <a href={shortUrl} target="_blank" rel="noopener noreferrer" className="short-link">
-            {shortUrl}
-          </a>
+          {error && <div className="error-msg">{error}</div>}
         </div>
-      )}
+      </div>
+
     </div>
   );
 }

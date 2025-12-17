@@ -2,20 +2,20 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: shorter-frontend  # نام هماهنگ شد
+  name: shorter-frontend
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: shorter-frontend # <--- کلید ماجرا اینجاست
+      app: shorter-frontend
   template:
     metadata:
       labels:
-        app: shorter-frontend # <--- این لیبل روی پاد می‌خورد
+        app: shorter-frontend 
     spec:
       containers:
         - name: frontend
-          image: YOUR_DOCKERHUB_USER/react-shortener:v1  # ⚠️ نام یوزرت رو چک کن
+          image: YOUR_DOCKERHUB_USER/react-shortener:v1
           imagePullPolicy: Always
           ports:
             - containerPort: 80
@@ -28,7 +28,7 @@ metadata:
   name: frontend-service
 spec:
   selector:
-    app: shorter-frontend  # <--- 🚨 این باید دقیقاً مثل لیبل بالا باشد
+    app: shorter-frontend
   ports:
     - protocol: TCP
       port: 80
@@ -40,6 +40,8 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: frontend-ingress
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
 spec:
   rules:
     - host: "46.34.163.151.nip.io"
@@ -52,3 +54,7 @@ spec:
                 name: frontend-service
                 port:
                   number: 80
+  tls:
+    - hosts:
+        - "46.34.163.151.nip.io"
+      secretName: frontend-tls-secret
